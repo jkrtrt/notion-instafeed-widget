@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="fr">
+  <meta name="x-widget-version" content="v2.1">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -110,6 +111,17 @@
   </dialog>
 
   <script>
+    const VERSION = 'v2.1';
+  // Affiche un badge si ?debug=1 (pratique pour l’embed Notion)
+  (function(){
+    const p = new URLSearchParams(location.search);
+    if (p.get('debug') === '1') {
+      const b = document.createElement('div');
+      b.textContent = 'InstaFeed ' + VERSION;
+      b.style.cssText = 'position:fixed;right:8px;bottom:8px;padding:6px 10px;background:#111;color:#fff;font:12px/1.2 system-ui;border-radius:6px;z-index:9999;opacity:.9';
+      document.addEventListener('DOMContentLoaded', () => document.body.appendChild(b));
+    }
+  })();
     const API_BASE = ""; // même origine
     const $ = s => document.querySelector(s);
     const grid = $("#grid"), lb = $("#lightbox");
