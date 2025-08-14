@@ -321,10 +321,24 @@
       render();
     });
 
-    // Auto-load si ?db= est présent
-    const params = new URLSearchParams(location.search);
-    const dbParam = params.get("db");
-    if (dbParam) { $("#db").value = dbParam; loadData(); }
-  </script>
-</body>
-</html>
+ // Lire les paramètres d'URL
+const params = new URLSearchParams(location.search);
+
+// Colonnes (2 à 8)
+const colsParam = parseInt(params.get("cols") || "", 10);
+if (!isNaN(colsParam) && colsParam >= 2 && colsParam <= 8) {
+  cols.value = String(colsParam);
+  setCols();
+}
+
+// Comptes pré-sélectionnés (séparés par des virgules)
+const comptesParam = params.get("comptes") || params.get("accounts");
+if (comptesParam) {
+  FILTER_COMPTES = new Set(
+    comptesParam.split(",").map(s => decodeURIComponent(s.trim())).filter(Boolean)
+  );
+}
+
+// Auto-load si ?db=...
+const dbParam = params.get("db");
+if (dbParam) { $("#db").value = dbParam; loadData(); }
