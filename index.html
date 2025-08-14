@@ -47,3 +47,80 @@
         <span class="meta">Colonnes :</span>
         <input id="cols" type="range" min="2" max="8" value="4" />
         <span id="colsVal" class="meta">4</span>
+      </div>
+      <button id="reset" class="btn secondary">Réinitialiser</button>
+    </div>
+    <div class="pill"><strong id="count">0</strong> items • tri: récents → anciens</div>
+  </header>
+
+  <main id="grid" aria-live="polite"></main>
+  <div id="empty" hidden>Aucun visuel à afficher.</div>
+
+  <dialog id="lightbox">
+    <div class="viewer">
+      <div class="head">
+        <div class="info">
+          <span id="lbCompte" class="pill">Compte</span>
+          <span id="lbDate" class="pill">Date</span>
+          <a id="lbLink" class="pill" target="_blank" rel="noopener">Lien d’origine</a>
+        </div>
+        <button class="close" onclick="lb.close()">Fermer</button>
+      </div>
+      <div id="lbMedia"></div>
+      <div id="lbCap" class="cap"></div>
+    </div>
+  </dialog>
+
+  <script>
+    const API_BASE = "";
+    const $ = s => document.querySelector(s);
+    const grid = $("#grid"), lb = $("#lightbox");
+    const compteSel = $("#compte"), countEl = $("#count");
+    const cols = $("#cols"), colsVal = $("#colsVal");
+    const empty = $("#empty");
+    const lbMedia = $("#lbMedia"), lbCap = $("#lbCap"), lbDate = $("#lbDate"), lbCompte = $("#lbCompte"), lbLink = $("#lbLink");
+    let ITEMS = []; let FILTER = new Set();
+
+    function fmtDate(iso){ if(!iso) return ""; try{ return new Date(iso).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'2-digit'}).replace('.',''); }catch{ return iso } }
+    function setCols(){ colsVal.textContent = cols.value; grid.style.gridTemplateColumns = `repeat(${cols.value},1fr)`; }
+    setCols(); cols.addEventListener('input', setCols);
+
+    function render(){
+      grid.innerHTML = "";
+      const subset = ITEMS.filter(it => FILTER.size ? it.comptes.some(c => FILTER.has(c)) : true);
+      countEl.textContent = subset.length; empty.hidden = subset.length > 0;
+      for (const it of subset) {
+        const f = it.files?.[0]; if(!f) continue;
+        const card = document.createElement("div"); card.className="card"; card.title = it.caption || "";
+        let media; if (f.type==="video"){ media=document.createElement("video"); media.src=f.url; media.muted=true; media.autoplay=true; media.loop=true; media.playsInline=true; } else { media=document.createElement("img"); media.src=f.url; media.className="thumb"; }
+        media.className="thumb"; card.appendChild(media);
+        const badge=document.createElement("div"); badge.className="badge"; badge.textContent=it.comptes.join(", ")||"—"; card.appendChild(badge);
+        const overlay=document.createElement("div"); overlay.className="overlay"; const cap=document.createElement("div"); cap.className="caption"; cap.textContent=it.caption||""; overlay.appendChild(cap); card.appendChild(overlay);
+        card.addEventListener("click",()=>openLightbox(it)); grid.appendChild(card);
+      }
+    }
+
+    function openLightbox(it){
+      lbMedia.innerHTML=""; it.files.forEach(f=>{ if(f.type==="video"){ const v=document.createElement("video"); v.src=f.url; v.controls=true; v.style.width="100%"; v.playsInline=true; lbMedia.appendChild(v); } else { const img=document.createElement("img"); img.src=f.url; img.style.width="100%"; lbMedia.appendChild(img); }});
+      lbCap.textContent=it.caption||""; lbDate.textContent=fmtDate(it.date)||"—"; lbCompte.textContent=it.comptes.join(", ")||"—";
+      if(it.link){ lbLink.href=it.link; lbLink.style.display="inline-flex"; } else { lbLink.removeAttribute("href"); lbLink.style.display="none"; }
+      lb.showModal();
+    }
+
+    function fillCompteOptions(list){ compteSel.innerHTML=""; list.forEach(name=>{ const opt=document.createElement("option"); opt.value=name; opt.textContent=name; compteSel.appendChild(opt); }); }
+    compteSel.addEventListener("change",()=>{ FILTER=new Set(Array.from(compteSel.selectedOptions).map(o=>o.value)); render(); });
+
+    async function loadData(){
+      const db=$("#db").value.trim(); if(!db){ alert("Renseigne le Database ID Notion."); return; }
+      const q=new URLSearchParams({ database_id: db }); if(FILTER.size) q.set("comptes", Array.from(FILTER).join(","));
+      const url=`${API_BASE}/api/feed?${q.toString()}`;
+      const res=await fetch(url,{ cache:"no-store" }); if(!res.ok){ const t=await res.text(); alert("Erreur API: "+t); return; }
+      const data=await res.json(); ITEMS=data.items||[]; fillCompteOptions(data.comptes||[]); render();
+    }
+    $("#load").addEventListener("click", loadData);
+    $("#reset").addEventListener("click", ()=>{ FILTER.clear(); Array.from(compteSel.options).forEach(o=>o.selected=false); cols.value=4; setCols(); render(); });
+
+    const params=new URLSearchParams(location.search); const dbParam=params.get("db"); if(dbParam){ $("#db").value=dbParam; loadData(); }
+  </script>
+</body>
+</html>
