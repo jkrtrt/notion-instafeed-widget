@@ -3,32 +3,58 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Preview Feed Instagram (Notion - Light Theme)</title>
+  <title>Preview Feed Instagram (Notion - Light Theme) v2</title>
   <style>
-    :root { --gap:12px; --bg:#ffffff; --card:#f9f9fb; --text:#1f2937; --muted:#6b7280; --accent:#2563eb; --border:#e5e7eb; }
-    *{ box-sizing:border-box } body{ margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial }
-    header{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:10 }
-    .controls{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
-    .control{ display:flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 10px }
-    input,select{ background:transparent; border:none; outline:none; color:var(--text) } input[type="text"]{ min-width:260px }
-    .btn{ background:var(--accent); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-weight:600; cursor:pointer }
-    .btn.secondary{ background:#f3f4f6; color:var(--text); border:1px solid var(--border) }
-    .meta{ color:var(--muted); font-size:12px }
-    #grid{ padding:14px; display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:var(--gap) }
-    .card{ position:relative; aspect-ratio:1/1; background:#fdfdfd; border:1px solid var(--border); border-radius:12px; overflow:hidden; cursor:pointer; transition:transform .15s ease }
-    .card:hover{ transform:translateY(-2px) } .thumb{ width:100%; height:100%; object-fit:cover; display:block }
-    .badge{ position:absolute; top:8px; left:8px; background:rgba(255,255,255,.9); color:var(--text); padding:3px 6px; font-size:11px; border-radius:6px; border:1px solid var(--border) }
-    .overlay{ position:absolute; inset:0; background:linear-gradient(to top, rgba(255,255,255,.8), rgba(255,255,255,0)); opacity:0; transition:.2s }
-    .card:hover .overlay{ opacity:1 }
-    .caption{ position:absolute; left:8px; right:8px; bottom:8px; color:var(--text); font-size:12px; line-height:1.3; max-height:3.2em; overflow:hidden; text-overflow:ellipsis }
-    .pill{ display:inline-flex; gap:6px; align-items:center; background:#f3f4f6; border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-size:12px; color:var(--text) }
-    dialog{ width:min(92vw,900px); border:none; border-radius:16px; padding:0; background:var(--bg); box-shadow:0 20px 80px rgba(0,0,0,.2) }
-    dialog::backdrop{ background:rgba(0,0,0,.45) } .viewer{ display:flex; flex-direction:column; gap:10px }
-    .viewer .head{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px }
-    .viewer .info{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:var(--muted); font-size:12px }
-    .viewer .cap{ padding:0 12px 12px; color:var(--text); font-size:14px; white-space:pre-wrap }
-    .close{ background:#f3f4f6; color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer }
-    #empty{ color:var(--muted); padding:18px }
+    :root {
+      --gap: 3px;               /* espacement demandé */
+      --bg: #ffffff;
+      --card: #f9f9fb;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --border: #e5e7eb;
+      --panel: #ffffff;
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+    * { box-sizing: border-box }
+    body { margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial }
+    header { display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:10 }
+    body.minimal header { display:none; } /* masque l’entête en embed Notion */
+    .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+    .control { display:flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 10px }
+    input { background:transparent; border:none; outline:none; color:var(--text) }
+    input[type="text"] { min-width:260px }
+    .btn { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-weight:600; cursor:pointer }
+    .btn.secondary { background:#f3f4f6; color:var(--text); border:1px solid var(--border) }
+    .meta { color:var(--muted); font-size:12px }
+    #grid { padding:14px; display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:var(--gap) }
+    .card { position:relative; aspect-ratio:1/1; background:#fdfdfd; border:1px solid var(--border); border-radius:0; overflow:hidden; cursor:pointer; transition:transform .15s ease }
+    .card:hover { transform:translateY(-1px) }
+    .thumb { width:100%; height:100%; object-fit:cover; display:block; border-radius:0 }
+    .badge { position:absolute; top:8px; left:8px; background:rgba(255,255,255,.9); color:var(--text); padding:3px 6px; font-size:11px; border-radius:6px; border:1px solid var(--border) }
+    .format { position:absolute; top:8px; right:8px; background:rgba(255,255,255,.95); border:1px solid var(--border); padding:4px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px }
+    .overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(255,255,255,.8), rgba(255,255,255,0)); opacity:0; transition:.2s }
+    .card:hover .overlay { opacity:1 }
+    .caption { position:absolute; left:8px; right:8px; bottom:8px; color:var(--text); font-size:12px; line-height:1.3; max-height:3.2em; overflow:hidden; text-overflow:ellipsis }
+
+    /* Dropdown à cases pour "Comptes" */
+    .dropdown { position:relative }
+    .dd-btn { display:inline-flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 10px; cursor:pointer }
+    .dd-panel { position:absolute; top:100%; left:0; margin-top:6px; background:var(--panel); border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow); min-width:220px; max-height:260px; overflow:auto; padding:8px; z-index:20; display:none }
+    .dropdown.open .dd-panel { display:block }
+    .dd-row { display:flex; align-items:center; gap:8px; padding:6px 4px }
+    .dd-actions { display:flex; gap:8px; justify-content:space-between; padding:6px 4px; border-top:1px solid var(--border); margin-top:6px }
+    .chip { background:#eef2ff; border:1px solid #dbeafe; color:#1f2937; border-radius:999px; padding:2px 8px; font-size:12px }
+
+    /* Lightbox */
+    dialog { width:min(92vw,900px); border:none; border-radius:16px; padding:0; background:var(--bg); box-shadow:0 20px 80px rgba(0,0,0,.2) }
+    dialog::backdrop { background:rgba(0,0,0,.45) }
+    .viewer { display:flex; flex-direction:column; gap:10px }
+    .viewer .head { display:flex; align-items:center; justify-content:space-between; padding:10px 12px }
+    .viewer .info { display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:var(--muted); font-size:12px }
+    .viewer .cap { padding:0 12px 12px; color:var(--text); font-size:14px; white-space:pre-wrap }
+    .close { background:#f3f4f6; color:#1f2937; border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer }
+    #empty { color:var(--muted); padding:18px }
   </style>
 </head>
 <body>
@@ -39,10 +65,22 @@
         <input id="db" type="text" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
         <button id="load" class="btn">Charger</button>
       </div>
-      <div class="control">
-        <span class="meta">Compte :</span>
-        <select id="compte" multiple size="1" title="Multi-sélection"></select>
+
+      <!-- Dropdown "Comptes" à cases -->
+      <div class="dropdown" id="compteDropdown">
+        <div class="dd-btn" id="ddToggle" role="button" aria-haspopup="true" aria-expanded="false">
+          <span class="meta">Comptes :</span>
+          <span id="ddSummary" class="chip">Tous</span>
+        </div>
+        <div class="dd-panel" id="ddPanel" role="menu" aria-label="Filtrer par compte">
+          <div id="ddList"></div>
+          <div class="dd-actions">
+            <button id="ddClear" class="btn secondary" type="button">Effacer</button>
+            <button id="ddApply" class="btn" type="button">Appliquer</button>
+          </div>
+        </div>
       </div>
+
       <div class="control">
         <span class="meta">Colonnes :</span>
         <input id="cols" type="range" min="2" max="8" value="4" />
@@ -72,55 +110,209 @@
   </dialog>
 
   <script>
-    const API_BASE = "";
+    const API_BASE = ""; // même origine
     const $ = s => document.querySelector(s);
     const grid = $("#grid"), lb = $("#lightbox");
-    const compteSel = $("#compte"), countEl = $("#count");
+    const countEl = $("#count");
     const cols = $("#cols"), colsVal = $("#colsVal");
     const empty = $("#empty");
     const lbMedia = $("#lbMedia"), lbCap = $("#lbCap"), lbDate = $("#lbDate"), lbCompte = $("#lbCompte"), lbLink = $("#lbLink");
-    let ITEMS = []; let FILTER = new Set();
 
-    function fmtDate(iso){ if(!iso) return ""; try{ return new Date(iso).toLocaleDateString('fr-FR',{year:'numeric',month:'short',day:'2-digit'}).replace('.',''); }catch{ return iso } }
-    function setCols(){ colsVal.textContent = cols.value; grid.style.gridTemplateColumns = `repeat(${cols.value},1fr)`; }
-    setCols(); cols.addEventListener('input', setCols);
+    // Dropdown éléments
+    const dd = $("#compteDropdown");
+    const ddToggle = $("#ddToggle");
+    const ddPanel = $("#ddPanel");
+    const ddList = $("#ddList");
+    const ddSummary = $("#ddSummary");
+    const ddClear = $("#ddClear");
+    const ddApply = $("#ddApply");
+
+    // Masquer le header automatiquement en embed Notion (ou ?ui=minimal)
+    (function detectEmbed(){
+      const p = new URLSearchParams(location.search);
+      const ui = p.get("ui");
+      const inIframe = window.top !== window.self;
+      const isNotionRef = /notion\.(so|site)/.test(document.referrer || "");
+      const minimal = ui === "minimal" || (!ui && (inIframe && isNotionRef));
+      if (minimal) document.body.classList.add("minimal");
+    })();
+
+    let ITEMS = [];
+    let FILTER_COMPTES = new Set();
+
+    function fmtDate(iso){
+      if(!iso) return "";
+      try { return new Date(iso).toLocaleDateString('fr-FR', { year:'numeric', month:'short', day:'2-digit' }).replace('.', ''); }
+      catch { return iso }
+    }
+
+    function setCols(){
+      colsVal.textContent = cols.value;
+      grid.style.gridTemplateColumns = `repeat(${cols.value}, 1fr)`;
+    }
+    setCols();
+    cols.addEventListener('input', setCols);
+
+    // Icônes de format (SVG inline)
+    function formatIcon(fmt){
+      const c = '#1f2937';
+      if(!fmt) return '';
+      const f = fmt.toLowerCase();
+      if (f.includes('reel')) {
+        return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-label="Reel">
+          <path d="M4 6h12l4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" stroke="${c}" stroke-width="1.5" fill="none"/>
+          <path d="M16 6l4 4h-4V6z" fill="${c}" opacity="0.15"/>
+          <path d="M8 11h6M8 15h6" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>`;
+      }
+      if (f.includes('carrousel') || f.includes('carousel')) {
+        return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-label="Carrousel">
+          <rect x="7" y="7" width="10" height="10" rx="1.5" stroke="${c}" stroke-width="1.5" fill="none"/>
+          <rect x="3" y="3" width="10" height="10" rx="1.5" stroke="${c}" stroke-width="1.2" fill="none" opacity="0.6"/>
+        </svg>`;
+      }
+      return ''; // Photo: pas d’icône
+    }
 
     function render(){
       grid.innerHTML = "";
-      const subset = ITEMS.filter(it => FILTER.size ? it.comptes.some(c => FILTER.has(c)) : true);
-      countEl.textContent = subset.length; empty.hidden = subset.length > 0;
+      // Masquer "Story" par défaut
+      const subset = ITEMS
+        .filter(it => (it.format || '').toLowerCase() !== 'story')
+        .filter(it => FILTER_COMPTES.size ? it.comptes.some(c => FILTER_COMPTES.has(c)) : true);
+
+      countEl.textContent = subset.length;
+      empty.hidden = subset.length > 0;
+
       for (const it of subset) {
-        const f = it.files?.[0]; if(!f) continue;
-        const card = document.createElement("div"); card.className="card"; card.title = it.caption || "";
-        let media; if (f.type==="video"){ media=document.createElement("video"); media.src=f.url; media.muted=true; media.autoplay=true; media.loop=true; media.playsInline=true; } else { media=document.createElement("img"); media.src=f.url; media.className="thumb"; }
-        media.className="thumb"; card.appendChild(media);
-        const badge=document.createElement("div"); badge.className="badge"; badge.textContent=it.comptes.join(", ")||"—"; card.appendChild(badge);
-        const overlay=document.createElement("div"); overlay.className="overlay"; const cap=document.createElement("div"); cap.className="caption"; cap.textContent=it.caption||""; overlay.appendChild(cap); card.appendChild(overlay);
-        card.addEventListener("click",()=>openLightbox(it)); grid.appendChild(card);
+        const file = it.files?.[0];
+        if (!file) continue;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.title = it.caption || "";
+
+        let media;
+        if (file.type === "video") {
+          media = document.createElement("video");
+          media.src = file.url; media.muted = true; media.autoplay = true; media.loop = true; media.playsInline = true;
+        } else {
+          media = document.createElement("img");
+          media.src = file.url; media.className = "thumb";
+        }
+        media.className = "thumb";
+        card.appendChild(media);
+
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        badge.textContent = it.comptes.join(", ") || "—";
+        card.appendChild(badge);
+
+        const icon = formatIcon(it.format || "");
+        if (icon) {
+          const fmt = document.createElement("div");
+          fmt.className = "format";
+          fmt.innerHTML = icon;
+          card.appendChild(fmt);
+        }
+
+        const overlay = document.createElement("div");
+        overlay.className = "overlay";
+        const cap = document.createElement("div");
+        cap.className = "caption";
+        cap.textContent = it.caption || "";
+        overlay.appendChild(cap);
+        card.appendChild(overlay);
+
+        card.addEventListener("click", () => openLightbox(it));
+        grid.appendChild(card);
       }
     }
 
     function openLightbox(it){
-      lbMedia.innerHTML=""; it.files.forEach(f=>{ if(f.type==="video"){ const v=document.createElement("video"); v.src=f.url; v.controls=true; v.style.width="100%"; v.playsInline=true; lbMedia.appendChild(v); } else { const img=document.createElement("img"); img.src=f.url; img.style.width="100%"; lbMedia.appendChild(img); }});
-      lbCap.textContent=it.caption||""; lbDate.textContent=fmtDate(it.date)||"—"; lbCompte.textContent=it.comptes.join(", ")||"—";
-      if(it.link){ lbLink.href=it.link; lbLink.style.display="inline-flex"; } else { lbLink.removeAttribute("href"); lbLink.style.display="none"; }
+      lbMedia.innerHTML = "";
+      it.files.forEach(f => {
+        if (f.type === "video") {
+          const v = document.createElement("video");
+          v.src = f.url; v.controls = true; v.style.width = "100%"; v.playsInline = true;
+          lbMedia.appendChild(v);
+        } else {
+          const img = document.createElement("img");
+          img.src = f.url; img.style.width = "100%";
+          lbMedia.appendChild(img);
+        }
+      });
+      lbCap.textContent = it.caption || "";
+      lbDate.textContent = fmtDate(it.date) || "—";
+      lbCompte.textContent = it.comptes.join(", ") || "—";
+      if (it.link) { lbLink.href = it.link; lbLink.style.display = "inline-flex"; } else { lbLink.removeAttribute("href"); lbLink.style.display = "none"; }
       lb.showModal();
     }
 
-    function fillCompteOptions(list){ compteSel.innerHTML=""; list.forEach(name=>{ const opt=document.createElement("option"); opt.value=name; opt.textContent=name; compteSel.appendChild(opt); }); }
-    compteSel.addEventListener("change",()=>{ FILTER=new Set(Array.from(compteSel.selectedOptions).map(o=>o.value)); render(); });
+    function buildCompteDropdown(list){
+      ddList.innerHTML = "";
+      list.forEach(name => {
+        const row = document.createElement("label");
+        row.className = "dd-row";
+        const cb = document.createElement("input");
+        cb.type = "checkbox"; cb.value = name; cb.checked = FILTER_COMPTES.has(name);
+        const span = document.createElement("span"); span.textContent = name;
+        row.appendChild(cb); row.appendChild(span);
+        ddList.appendChild(row);
+      });
+      updateDdSummary();
+    }
+
+    function updateDdSummary(){
+      if (!FILTER_COMPTES.size) { ddSummary.textContent = "Tous"; return; }
+      const arr = Array.from(FILTER_COMPTES);
+      ddSummary.textContent = arr.length === 1 ? arr[0] : `${arr.length} comptes`;
+    }
+
+    ddToggle.addEventListener("click", () => {
+      dd.classList.toggle("open");
+      ddToggle.setAttribute("aria-expanded", dd.classList.contains("open") ? "true" : "false");
+    });
+    ddClear.addEventListener("click", () => {
+      FILTER_COMPTES.clear();
+      Array.from(ddList.querySelectorAll('input[type="checkbox"]')).forEach(cb => cb.checked = false);
+      updateDdSummary(); render();
+    });
+    ddApply.addEventListener("click", () => {
+      FILTER_COMPTES = new Set(Array.from(ddList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value));
+      updateDdSummary(); dd.classList.remove("open"); ddToggle.setAttribute("aria-expanded","false");
+      render();
+    });
+    document.addEventListener("click", (e) => {
+      if (!dd.contains(e.target)) { dd.classList.remove("open"); ddToggle.setAttribute("aria-expanded","false"); }
+    });
 
     async function loadData(){
-      const db=$("#db").value.trim(); if(!db){ alert("Renseigne le Database ID Notion."); return; }
-      const q=new URLSearchParams({ database_id: db }); if(FILTER.size) q.set("comptes", Array.from(FILTER).join(","));
-      const url=`${API_BASE}/api/feed?${q.toString()}`;
-      const res=await fetch(url,{ cache:"no-store" }); if(!res.ok){ const t=await res.text(); alert("Erreur API: "+t); return; }
-      const data=await res.json(); ITEMS=data.items||[]; fillCompteOptions(data.comptes||[]); render();
+      const db = $("#db").value.trim();
+      if(!db){ alert("Renseigne le Database ID Notion."); return; }
+      const q = new URLSearchParams({ database_id: db });
+      const url = `${API_BASE}/api/feed?${q.toString()}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if(!res.ok){ const t = await res.text(); alert("Erreur API: "+t); return; }
+      const data = await res.json();
+      ITEMS = data.items || [];
+      buildCompteDropdown(data.comptes || []);
+      render();
     }
-    $("#load").addEventListener("click", loadData);
-    $("#reset").addEventListener("click", ()=>{ FILTER.clear(); Array.from(compteSel.options).forEach(o=>o.selected=false); cols.value=4; setCols(); render(); });
 
-    const params=new URLSearchParams(location.search); const dbParam=params.get("db"); if(dbParam){ $("#db").value=dbParam; loadData(); }
+    $("#load").addEventListener("click", loadData);
+    $("#reset").addEventListener("click", () => {
+      FILTER_COMPTES.clear();
+      if (ddList) Array.from(ddList.querySelectorAll('input[type="checkbox"]')).forEach(cb => cb.checked = false);
+      cols.value = 4; setCols();
+      updateDdSummary();
+      render();
+    });
+
+    // Auto-load si ?db= est présent
+    const params = new URLSearchParams(location.search);
+    const dbParam = params.get("db");
+    if (dbParam) { $("#db").value = dbParam; loadData(); }
   </script>
 </body>
 </html>
